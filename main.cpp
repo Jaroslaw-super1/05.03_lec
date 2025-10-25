@@ -1,13 +1,17 @@
 # include <iostream>
 
-bool is_Pyth (unsigned a, unsigned b, unsigned c);
+# include <iostream>
 
 int main () {
     using u_t = unsigned;
     u_t a = 0;
-    u_t a = 0;
-
     std::cin >> a;
 
-    std::cout << 1 << "\n";
+    if (std::cin.eof()) {
+        std::cout << 1;
+        std::cout << "\n";
+    } else if (std::cin.fail()) {
+        std::cerr << "Input error\n";
+        return 1;
+    }
 }
