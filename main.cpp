@@ -1,6 +1,6 @@
 # include <iostream>
 # include <limits>
-
+// тест
 bool oversize_multiplise(size_t a, size_t b) {
 
     const size_t lim_size_t = std::numeric_limits<size_t>::max();
