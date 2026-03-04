@@ -14,6 +14,151 @@ struct BiList
   BiList< T > * prev;
 };
 
+template < class T > BiList< T > * fake()
+{
+  constexpr size_t s = sizeof(BiList< T >);
+  return static_cast< BiList< T > * >(::operator new(s)); // T::T()
+}
+
+template < class T > BiList< T > * addfake(BiList< T > * h)
+{
+  BiList< T > * r = static_cast< BiList< T > * >(::operator new(sizeof(BiList< T > *))); // T::T()
+  r->next = h;
+  r->prev = nullptr;
+  return r;
+}
+
+template < class T > BiList< T > * rmfake(BiList< T > * h) noexcept
+{
+  BiList< T > * res = h->next;
+  ::operator delete(h);
+  return res;
+}
+
+template < class T > BiList< T > * add(BiList< T > * h, const T & d)
+{
+  BiList< T > mid = new BiList< T >{d, h, h->prev}; // T::T(cont T &)
+  h->prev->next = mid;
+  h->prev = mid;
+  return mid;
+}
+
+template < class T > BiList< T > * insert(BiList< T > * h, const T & d)
+{
+  BiList< T > * next = new BiList< T >{d, h->next, h}; // T::T(cont T &)
+  h->next->prev = next;
+  h->next = next;
+  return next;
+}
+
+template < class T > BiList< T > * cut(BiList< T > * h) noexcept
+{
+  BiList< T > * res = h->next;
+  res->prev = h->prev;
+  h->prev->next = res;
+  delete h;
+  return res;
+}
+
+template < class T > BiList< T > * erase(BiList< T > * h) noexcept
+{
+  return h->next = cut(h->next);
+}
+
+template < class T > BiList< T > * clear(BiList< T > * h, BiList< T > * e) noexcept
+{
+  while (h != e)
+  {
+    h = cut(h);
+  }
+  return h;
+}
+
+template < class T, class F > F traverse(F f, BiList< T > * h, BiList< T > * end)
+{
+  for (; h != end; h = h->next)
+  {
+    f(h->val); // F::operator()
+  }
+  return f; // F::F(const F&)
+}
+
+template < class T, class F > F rTraverse(F f, BiList< T > * tail, BiList< T > * end)
+{
+  for (; tail != end; tail = tail->prev)
+  {
+    f(tail->val); // F::operator()
+  }
+  return f; // F::F(const F&)
+}
+
+template < class T >
+BiList< T > * convert(T * arr, size_t size)
+{
+  BiList< T > * h = fake< T >();
+  BiList< T > * list = h;
+  for (size_t i = 0; i < size; ++i)
+  {
+    try
+    {
+      list = insert(list, arr[i]); // T::T(cont T &)
+    }
+    catch (...)
+    {
+      clear(h, nullptr);
+      throw;
+    }
+  }
+  return h;
+}
+
+
+int main()
+{
+  int arr[] = {1, 2, 3, 4, 5};
+  BiList<int> * list = convert(arr, 5);
+
+  BiList<int> * a = clear(list, nullptr);
+  cut(a);
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+// Задача 2, 3
+template < class T >
+struct BiList
+{
+  T val;
+  BiList< T > * next;
+  BiList< T > * prev;
+};
+
 
 // создание пустого списка
 template <typename T>
@@ -173,3 +318,4 @@ int main()
 
   return 0;
 }
+*/
